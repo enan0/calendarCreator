@@ -1,0 +1,179 @@
+  <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+      <!-- <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script> -->
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular.min.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.7/angular-animate.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/1.3.3/ui-bootstrap.min.js"></script>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+      <style>
+      .notification {
+        /*border: 10px dotted black;*/
+        padding-left: 15px;
+        padding-right: 15px;
+        background: white;
+        background-clip: padding-box;
+      }
+      .col-centered{
+        float: none;
+        margin: 0 auto;
+      }
+      .btn.disabled{
+        cursor:none !importante;
+      }
+      </style>
+      
+<style>
+/* The Modal (background) */
+.modal {
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 99; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    /*background: url('http://www.termasdecatillo.com/images/bg_santiago.jpg') no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+  	font-family: 'Open Sans',Arial,Helvetica,Sans-Serif;*/
+}
+
+/* Modal Content */
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+/* About Blur */
+.child {
+    -webkit-filter: blur(5px);
+    transform: scale(1.03);
+}
+</style>
+      
+      </head> 
+  <body>
+    <script>
+      var app = angular.module("app", ['ui.bootstrap']);
+
+      app.controller("appCtrl", function($scope) {
+        $scope.aboutModalActive = false;
+        $scope.date;
+        $scope.message = {};
+        $scope.hideWeekend = {saturday:1,sunday:2};
+       
+        $scope.crear = function(date){
+          var month = date.getMonth()+1;
+          var year = date.getFullYear();
+          var hideWeekend = $scope.hideWeekend.saturday + $scope.hideWeekend.sunday;
+          google.script.run
+            .withSuccessHandler(onSuccess)
+            .withFailureHandler(onError)
+            .createCalendar(month, year, hideWeekend);
+        }
+        var onSuccess = function(text){
+          console.log(text);
+          $scope.$apply(function () {
+            $scope.message.text = "Hoja creada correctamente";
+            $scope.message.status = "success";
+          });
+        }
+        var onError = function(error){
+          $scope.$apply(function () {
+            $scope.message.text = error.message;
+            $scope.message.status = "danger";
+          });
+        }        
+      });
+
+  </script>
+  
+
+  <div ng-app="app" ng-controller="appCtrl" style="overflow-x: hidden;">
+
+    <p class="alert alert-info text-center">Herramienta para crear una hoja nueva con estructura de calendario del mes elegido.
+      <span class="pull-right"> 
+        <button class="glyphicon glyphicon-question-sign btn btn-link" data-toggle="modal" ng-click="aboutModalActive = true"></button> 
+      </span>
+    </p>
+    
+    <p class="text-center">Seleccionar mes </p>    
+    <div class="row">
+      <div class="col-xs-4">
+          <p class="input-group" style="margin-left:10%">
+            <input type="month" class="form-control" ng-model="date" required />
+            <!-- <input type="hidden" datepicker-popup="yyyy-MM" ng-model="date" is-open="opened" ng-required="true" close-text="Close" />  -->
+            <span class="input-group-btn">
+              <button type="submit" class="btn btn-success" ng-disabled="date == undefined" ng-click="crear(date)">Crear</button>
+            </span>
+          </p>
+      </div>
+    </div>
+
+    <br/>
+
+    <div class="row">
+      <p class="text-center">Quitar del calendario:</p>
+      <div class=" col-xs-offset-3 "> 
+        <div class="btn-group" data-toggle="buttons">  
+          <label class="btn btn-default btn-small" ng-class="{'active': hideWeekend.saturday > 0}" >
+            <input type="checkbox" ng-model="hideWeekend.saturday" ng-true-value="1" ng-false-value="0"> Sábado
+          </label>
+          <label class="btn btn-default btn-small" ng-class="{'active': hideWeekend.sunday > 0}">
+            <input type="checkbox" ng-model="hideWeekend.sunday" ng-true-value="2" ng-false-value="0"> Domingo
+          </label>
+        </div>
+      </div>    
+    </div>
+    
+    <hr>
+    <div class="notification"><!-- style="position: fixed; bottom: 20px;" // footer center-block -->
+      <p class="alert alert-{{message.status}} col-md-4 center-block text-center" ng-show="message.text">{{message.text}}</p>
+    </div>
+    <hr>
+
+    <button style="position: fixed; bottom: 20px; left: 40%" class="btn" ng-class="{'btn-danger':hover, 'btn-default':!hover}" 
+            ng-mouseenter="hover=true" ng-mouseleave="hover=false" onclick="google.script.host.close()" > Cerrar
+    </button>
+
+    <!-- About Modal -->
+    <div class="modal" ng-show="aboutModalActive">
+      <div class="modal-content">
+        
+        <div class="modal-header">
+          <span class="close" ng-click="aboutModalActive = false">&times;</span>
+          <h4 class="modal-title text-center">About</h4>
+        </div>
+        <div class="modal-body">
+          <p class=""> Desarrollado por </p>
+          <div class="row">
+            <div class="col-xs-4">
+              <a href="mailto:mxtorchio@gmail.com">
+                <img class="img-circle img-center" width="50" height="50" src="https://avatars2.githubusercontent.com/u/11033783?v=3&u=bf36ef83be75dc7f54a4e0faf45623ea58db41cc&s=140" alt="">
+              </a>
+            </div>
+            <div class="col-xs-6">
+              <p class="text-center"> Maximiliano Torchio</p>
+            </div>
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-default center-block" type="button" ng-click="aboutModalActive = false">Cerrar</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</body>
