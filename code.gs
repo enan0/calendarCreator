@@ -1,7 +1,7 @@
 /**
  * @OnlyCurrentDoc
  */
-var weekDays = ["Domingo","Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+var weekDays = ["Domingo","Lunes", "Martes", "MiÃ©rcoles", "Jueves", "Viernes", "SÃ¡bado"];
 var yearMonths = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
 
 function onOpen(e) {
@@ -33,9 +33,9 @@ function showSidebar() {
 function createCalendar(mounthNumber, year, hideWeekEndOption) {
   
   var thisSpreadsheet = SpreadsheetApp.getActiveSpreadsheet();
-  var monthName = yearMonths[mounthNumber-1];
-  var nextMounthSheet = thisSpreadsheet.insertSheet(monthName, thisSpreadsheet.getNumSheets()+1);
-  nextMounthSheet.appendRow( weekDays );
+  var sheetName = yearMonths[mounthNumber-1];
+  sheetName = sheetName+" "+year;
+  var nextMounthSheet = thisSpreadsheet.insertSheet(sheetName, thisSpreadsheet.getNumSheets()+1);
   
   populateCellsCalendar( nextMounthSheet, year, mounthNumber );
   hideWeekEnd( nextMounthSheet, hideWeekEndOption );
@@ -45,11 +45,11 @@ function createCalendar(mounthNumber, year, hideWeekEndOption) {
 
 function hideWeekEnd(sheet, option){
   if( option == 1 )
-    sheet.deleteColumn( weekDays.indexOf("Sábado")+1 );
+    sheet.deleteColumn( weekDays.indexOf("SÃ¡bado")+1 );
   else if( option == 2 )
     sheet.deleteColumn( weekDays.indexOf("Domingo")+1 );
   else if( option == 3 ) {
-    sheet.deleteColumn( weekDays.indexOf("Sábado")+1 );
+    sheet.deleteColumn( weekDays.indexOf("SÃ¡bado")+1 );
     sheet.deleteColumn( weekDays.indexOf("Domingo")+1 );
   }
 }
